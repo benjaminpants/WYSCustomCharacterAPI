@@ -173,11 +173,11 @@ namespace WYSCustomCharacterAPI
                 cur_step_gml = Conviences.AttachInject(cur_step_gml, curchar, "StepEnd", true, "//INJECT", i.ToString());
                 cur_draw_gml = Conviences.AttachInject(cur_draw_gml, curchar, "Draw", true, "//INJECT", i.ToString());
                 data.Code.ByName("gml_Object_obj_player_Create_0").AppendGMLSafe(curchar.Scripts.ContainsKey("Create") ? curchar.Scripts["Create"] : "", data);
-
-
+                
+                
                 //Get all the Scripts in the character that begin with "Collision_"
                 IEnumerable<KeyValuePair<string,string>> collision_scripts = curchar.Scripts.Where(x => x.Key.StartsWith("Collision_"));
-
+                
                 if (collision_scripts.Count() != 0)
                 {
                     foreach (KeyValuePair<string, string> item in collision_scripts)
@@ -221,10 +221,10 @@ namespace WYSCustomCharacterAPI
             { 
                 instance = charactersMenu.Name.Content
             });
-
-
+            
+            
         }
-
+        
         public static UndertaleScript CreateScriptFromKVP(UndertaleData data, string name, string key, ushort arguments)
         {
             return data.CreateScript(name, GMLkvp[key], arguments);

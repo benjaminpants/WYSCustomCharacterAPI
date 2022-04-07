@@ -10,7 +10,7 @@
 	"underwaterFriction":0.95,
 	"jumpMultiplier":0.7,
 	"gravityMultiplier":1,
-	"conveyorMultiplier":1.02,
+	"conveyorMultiplier":0.05,
 	"bubbleScale":1,
 	"trailColor":"c_gray",
 	"jumps":5

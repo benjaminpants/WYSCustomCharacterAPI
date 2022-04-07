@@ -1,0 +1,21 @@
+{
+	"id":"golfball",
+	"name":"Golfball",
+	"description":"Why go outside and golf when you can stay here and golf?",
+	"allowSnailLines":false,
+	"useSlitherSound":false,
+	"useSnailVoice":false,
+	"renderEyes":false,
+	"speedMultiplier":2,
+	"underwaterFriction":0.95,
+	"jumpMultiplier":1,
+	"gravityMultiplier":1,
+	"conveyorMultiplier":1,
+	"bubbleScale":0.5,
+	"trailColor":"obj_levelstyler.col_player_trail",
+	"jumps":1
+
+
+
+
+}
