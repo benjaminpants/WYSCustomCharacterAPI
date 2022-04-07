@@ -1,0 +1,21 @@
+{
+	"id":"brokendrone",
+	"name":"Broken Drone",
+	"description":"You are a broken drone! Your wheels are broken and you can't hover.. (This was originally a car)",
+	"allowSnailLines":true,
+	"useSnailVoice":false,
+	"useSlitherSound":false,
+	"renderEyes":false,
+	"speedMultiplier":1,
+	"underwaterFriction":0.95,
+	"jumpMultiplier":0.7,
+	"gravityMultiplier":1,
+	"conveyorMultiplier":1.02,
+	"bubbleScale":1,
+	"trailColor":"c_gray",
+	"jumps":5
+
+
+
+
+}

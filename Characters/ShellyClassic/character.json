@@ -1,0 +1,21 @@
+{
+	"id":"shellyclassic",
+	"name":"Classic!Shelly",
+	"description":"The one and only original! Now with a triple jump!(However his jumps are less powerful as a whole!)",
+	"allowSnailLines":true,
+	"useSlitherSound":true,
+	"useSnailVoice":false,
+	"renderEyes":false,
+	"speedMultiplier":1,
+	"underwaterFriction":0.95,
+	"jumpMultiplier":0.89,
+	"gravityMultiplier":1,
+	"conveyorMultiplier":1,
+	"bubbleScale":1,
+	"trailColor":"c_orange",
+	"jumps":3
+
+
+
+
+}

@@ -50,7 +50,7 @@ namespace WYSCustomCharacterAPI
 
         }
         
-        public static string AttachInject(string gml, CustomCharacter chara, string key, bool addconditional, string injectosearch, string enumreplace = "")
+        public static string AttachInject(string gml, CustomCharacter chara, string key, bool addconditional, string injectosearch, string enumreplace = "", bool failsafe = false)
         {
             if (chara.Scripts.ContainsKey(key))
             {
@@ -60,6 +60,15 @@ namespace WYSCustomCharacterAPI
                 {
                     gml = gml.Replace("ENUM_CHARACTERID",enumreplace);
                 }
+            }
+            else if (failsafe)
+            {
+                Logger.Log("Failsafe does not have:" + key, Logger.LogLevel.Warn);
+                return gml;
+            }
+            else
+            {
+                return AttachInject(gml, WYSCustomCharacterAPI.GameMakerMod.CustomCharacters.First(x => x.id == "shelly"), key, addconditional, injectosearch, enumreplace, true); //default to shelly
             }
             return gml;
         }

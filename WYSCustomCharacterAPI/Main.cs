@@ -20,12 +20,14 @@ namespace WYSCustomCharacterAPI
         public string description = "placeholder";
         public string trailColor = "c_white";
         public bool allowSnailLines = true;
+        public bool useSnailVoice = true;
         public bool useSlitherSound = true;
         public bool renderEyes = true;
         public double speedMultiplier = 1;
         public double underwaterFriction = 0.95;
         public double jumpMultiplier = 1;
         public double gravityMultiplier = 1;
+        public double bubbleScale = 1;
         public int jumps = 2;
         public double conveyorMultiplier = 1;
         [JsonIgnore]
@@ -120,13 +122,20 @@ namespace WYSCustomCharacterAPI
 
             List<Menus.WysMenuOption> options = new List<Menus.WysMenuOption>();
             
-            data.Code.ByName("gml_Object_obj_player_Create_0").AppendGMLSafe("global.current_character = 0;",data);
+            data.Code.ByName("gml_Object_obj_player_Create_0").AppendGMLSafe($@"
+            if (!variable_global_exists(""current_character""))
+            {{
+                global.current_character = {CustomCharacters.IndexOf(CustomCharacters.First(x => x.id == "shelly"))};
+            }}
+            scr_autowhobble_ini()", data);
 
             string cur_gml = GMLkvp["gml_Script_scr_move_like_a_snail_ini"];
             string cur_move_gml = GMLkvp["gml_Script_scr_move_like_a_snail"];
             string cur_draw_gml = GMLkvp["gml_Object_obj_player_Draw_0"];
+            string cur_step_gml = "//INJECT";
+            Dictionary<string,string> stupid_workaround = new Dictionary<string, string>();
             CreateScriptFromKVP(data, "scr_set_character", "gml_Script_scr_set_character", 1);
-
+            
             for (int i = 0; i < CustomCharacters.Count; i++)
             {
                 CustomCharacter curchar = CustomCharacters[i];
@@ -153,11 +162,18 @@ namespace WYSCustomCharacterAPI
 	            jump_count = {curchar.jumps}
 	            conveyor_multiplier = {curchar.conveyorMultiplier}
                 underwater_friction = {curchar.underwaterFriction}
-                trail_color = {curchar.trailColor}", true, "//INJECT MULTIPLIERS", i.ToString());
+                trail_color = {curchar.trailColor}
+                use_voice = {curchar.useSnailVoice.ToString().ToLower()}
+                chbubble_scale = {curchar.bubbleScale}", true, "//INJECT MULTIPLIERS", i.ToString());
                 cur_move_gml = Conviences.AttachInject(cur_move_gml, curchar, "Override", true, "//INJECT COMPLETE OVERRIDE", i.ToString());
+                cur_move_gml = Conviences.AttachInject(cur_move_gml, curchar, "Jump", true, "//INJECT JUMP", i.ToString());
+                cur_move_gml = Conviences.AttachInject(cur_move_gml, curchar, "Physics", true, "//INJECT PHYSICS", i.ToString());
+                cur_move_gml = Conviences.AttachInject(cur_move_gml, curchar, "Collisions", true, "//INJECT COLLISIONS", i.ToString());
                 cur_gml = Conviences.AttachInject(cur_gml, curchar, "Initialization", false, "//INJECT", i.ToString());
-                cur_draw_gml = Conviences.AttachInject(cur_draw_gml, curchar, "Draw", false, "//INJECT", i.ToString());
-                data.Code.ByName("gml_Object_obj_player_Create_0").AppendGMLSafe(curchar.Scripts["Create"] != null ? curchar.Scripts["Create"] : "//lol", data);
+                cur_step_gml = Conviences.AttachInject(cur_step_gml, curchar, "StepEnd", true, "//INJECT", i.ToString());
+                cur_draw_gml = Conviences.AttachInject(cur_draw_gml, curchar, "Draw", true, "//INJECT", i.ToString());
+                data.Code.ByName("gml_Object_obj_player_Create_0").AppendGMLSafe(curchar.Scripts.ContainsKey("Create") ? curchar.Scripts["Create"] : "", data);
+
 
                 //Get all the Scripts in the character that begin with "Collision_"
                 IEnumerable<KeyValuePair<string,string>> collision_scripts = curchar.Scripts.Where(x => x.Key.StartsWith("Collision_"));
@@ -166,37 +182,43 @@ namespace WYSCustomCharacterAPI
                 {
                     foreach (KeyValuePair<string, string> item in collision_scripts)
                     {
-                        Hooker.HookCode("gml_Object_obj_player_" + item.Key, item.Value + "\n#orig#()"); //only reason I do it like this is to keep consistency
+                        string ind = "gml_Object_obj_player_" + item.Key;
+                        if (stupid_workaround.ContainsKey(ind))
+                        {
+                            stupid_workaround[ind] = Conviences.AttachInject(stupid_workaround[ind], curchar, item.Key, false, "//INJECT", i.ToString());
+                        }
+                        else
+                        {
+                            stupid_workaround.Add(ind, Conviences.AttachInject("//INJECT", curchar, item.Key, false, "//INJECT", i.ToString()));
+                        }
                     }
                 }
                 
                 
             }
 
-            try
+            foreach (KeyValuePair<string,string> item in stupid_workaround)
             {
-                data.Code.ByName("gml_GlobalScript_scr_move_like_a_snail_ini").ReplaceGML(cur_gml, data);
-            }
-            catch (Exception)
-            {
-
+                Hooker.HookCode(item.Key, item.Value + "\n#orig#()"); //only reason I do it like this is to keep consistency
             }
 
-            try
-            {
-                data.Code.ByName("gml_GlobalScript_scr_move_like_a_snail").ReplaceGML(cur_move_gml, data);
-            }
-            catch (Exception)
-            {
+            data.Code.ByName("gml_Object_obj_player_Step_0").AppendGMLSafe("scr_autowhobble_update()\n" + cur_step_gml,data);
 
-            }
+
+            Hooker.ReplaceGmlSafe(data.Code.ByName("gml_GlobalScript_scr_move_like_a_snail_ini"), cur_gml);
+
+            Hooker.ReplaceGmlSafe(data.Code.ByName("gml_Object_obj_player_Draw_0"), cur_draw_gml);
+
+
+            Hooker.ReplaceGmlSafe(data.Code.ByName("gml_GlobalScript_scr_move_like_a_snail"), cur_move_gml);
+
 
 
 
             UndertaleGameObject charactersMenu = Menus.CreateMenu("Mods",options.ToArray());
 
             Menus.InsertMenuOptionFromEnd(Menus.Vanilla.Gameplay, 1, new Menus.WysMenuOption("\"Characters\"")
-            {
+            { 
                 instance = charactersMenu.Name.Content
             });
 

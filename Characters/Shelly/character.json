@@ -4,12 +4,14 @@
 	"description":"The classic snail! Everybody loves him!",
 	"allowSnailLines":true,
 	"useSlitherSound":true,
+	"useSnailVoice":true,
 	"renderEyes":true,
 	"speedMultiplier":1,
 	"underwaterFriction":0.95,
 	"jumpMultiplier":1,
 	"gravityMultiplier":1,
 	"conveyorMultiplier":1,
+	"bubbleScale":1,
 	"trailColor":"obj_levelstyler.col_player_trail",
 	"jumps":2
 

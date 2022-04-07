@@ -14,6 +14,8 @@ scr_move_like_a_snail_ini = function() //gml_Script_scr_move_like_a_snail_ini
 	jump_count = 2
 	conveyor_multiplier = 1
 	underwater_friction = 0.95
+	use_voice = true
+	chbubble_scale = 1
 	trail_color = c_white
 	//INJECT
 }
