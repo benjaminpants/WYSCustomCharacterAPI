@@ -1,6 +1,8 @@
 ﻿using GmmlPatcher;
+using GmmlHooker;
 using UndertaleModLib;
 using UndertaleModLib.Models;
+using System.Linq;
 using System;
 using WysApi.Api;
 using System.IO;
@@ -43,7 +45,7 @@ namespace WYSCustomCharacterAPI
         public static Dictionary<string, string> DictionarizeGMLFolder(string gmlfolder)
         {
             Dictionary<string, string> Dict = new Dictionary<string, string>();
-
+            
             try
             {
                 string[] infos = Directory.GetFiles(gmlfolder);
@@ -118,18 +120,22 @@ namespace WYSCustomCharacterAPI
 
             List<Menus.WysMenuOption> options = new List<Menus.WysMenuOption>();
             
-            data.Code.ByName("gml_Object_obj_player_Create_0").AppendGMLSafeSN("global.current_character = 0;",data);
+            data.Code.ByName("gml_Object_obj_player_Create_0").AppendGMLSafe("global.current_character = 0;",data);
 
             string cur_gml = GMLkvp["gml_Script_scr_move_like_a_snail_ini"];
             string cur_move_gml = GMLkvp["gml_Script_scr_move_like_a_snail"];
+            string cur_draw_gml = GMLkvp["gml_Object_obj_player_Draw_0"];
+            CreateScriptFromKVP(data, "scr_set_character", "gml_Script_scr_set_character", 1);
 
             for (int i = 0; i < CustomCharacters.Count; i++)
             {
                 CustomCharacter curchar = CustomCharacters[i];
-                options.Add(new Menus.WysMenuOption("\"" + curchar.name + "\"")
+                options.Add(new Menus.WysMenuOption(new UndertaleString(curchar.name).ToString())
                 {
                     tooltipScript = Menus.Vanilla.Tooltips.Text,
-                    tooltipArgument = "\"" + curchar.description + "\""
+                    tooltipArgument = new UndertaleString(curchar.description).ToString(),
+                    script = "scr_set_character",
+                    scriptArgument = i.ToString()
                 });
                 if (!curchar.renderEyes)
                 {
@@ -150,7 +156,21 @@ namespace WYSCustomCharacterAPI
                 trail_color = {curchar.trailColor}", true, "//INJECT MULTIPLIERS", i.ToString());
                 cur_move_gml = Conviences.AttachInject(cur_move_gml, curchar, "Override", true, "//INJECT COMPLETE OVERRIDE", i.ToString());
                 cur_gml = Conviences.AttachInject(cur_gml, curchar, "Initialization", false, "//INJECT", i.ToString());
-                data.Code.ByName("gml_Object_obj_player_Create_0").AppendGMLSafeSN(curchar.Scripts["Create"] != null ? curchar.Scripts["Create"] : "//lol", data);
+                cur_draw_gml = Conviences.AttachInject(cur_draw_gml, curchar, "Draw", false, "//INJECT", i.ToString());
+                data.Code.ByName("gml_Object_obj_player_Create_0").AppendGMLSafe(curchar.Scripts["Create"] != null ? curchar.Scripts["Create"] : "//lol", data);
+
+                //Get all the Scripts in the character that begin with "Collision_"
+                IEnumerable<KeyValuePair<string,string>> collision_scripts = curchar.Scripts.Where(x => x.Key.StartsWith("Collision_"));
+
+                if (collision_scripts.Count() != 0)
+                {
+                    foreach (KeyValuePair<string, string> item in collision_scripts)
+                    {
+                        Hooker.HookCode("gml_Object_obj_player_" + item.Key, item.Value + "\n#orig#()"); //only reason I do it like this is to keep consistency
+                    }
+                }
+                
+                
             }
 
             try

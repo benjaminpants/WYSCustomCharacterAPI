@@ -44,14 +44,9 @@ namespace WYSCustomCharacterAPI
             return obj;
         }
 
-        //I CAN DEPRECATE THIS FUNCTION BUT IM TOO LAZY TO UPDATE MY VERSION RN
-        public static void AppendGMLSafeSN(this UndertaleCode code, string gml, UndertaleData data)
+        public static void AppendGMLSafe(this UndertaleCode code, string gml, UndertaleData data)
         {
-            try
-            {
-                code.AppendGML(gml, data);
-            }
-            catch (Exception) { }
+            GmmlHooker.Hooker.AppendGmlSafe(code, gml); //CONFIG MAKE THIS AN EXTENSION METHOD
 
         }
         

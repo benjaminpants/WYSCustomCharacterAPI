@@ -1,0 +1,5 @@
+GmmlHooker.dll
+GmmlPatcher.dll
+Newtonsoft.Json.dll
+UndertaleModLib.dll
+WysApi.dll

@@ -7,6 +7,9 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Reference Include="GmmlHooker">
+      <HintPath>..\Dependencies\GmmlHooker.dll</HintPath>
+    </Reference>
     <Reference Include="GmmlPatcher">
       <HintPath>..\Dependencies\GmmlPatcher.dll</HintPath>
     </Reference>
