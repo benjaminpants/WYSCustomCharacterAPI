@@ -1,0 +1,24 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net6.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Reference Include="GmmlPatcher">
+      <HintPath>..\Dependencies\GmmlPatcher.dll</HintPath>
+    </Reference>
+    <Reference Include="Newtonsoft.Json">
+      <HintPath>..\Dependencies\Newtonsoft.Json.dll</HintPath>
+    </Reference>
+    <Reference Include="UndertaleModLib">
+      <HintPath>..\Dependencies\UndertaleModLib.dll</HintPath>
+    </Reference>
+    <Reference Include="WysApi">
+      <HintPath>..\Dependencies\WysApi.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+
+</Project>
