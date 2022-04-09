@@ -15,6 +15,7 @@
 	"trailColor":"obj_levelstyler.col_player_trail",
 	"flareColor":"obj_levelstyler.col_snail_flare",
 	"deathColor":"obj_levelstyler.col_snail_death",
+	"mainColor":"obj_levelstyler.col_snail",
 	"jumps":2
 
 

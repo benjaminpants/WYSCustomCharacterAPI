@@ -23,6 +23,7 @@ namespace WYSCustomCharacterAPI
         public string trailColor = "c_white";
         public string flareColor = "c_white";
         public string deathColor = "c_white";
+        public string mainColor = "c_white";
         public bool allowSnailLines = true;
         public bool useSnailVoice = true;
         public bool useSlitherSound = true;
@@ -163,6 +164,7 @@ namespace WYSCustomCharacterAPI
             string cur_darkflare = GMLkvp["gml_Object_obj_darkFollowFlare_Step_0"];
             string cur_trail_part_color = "//INJECT";
             string cur_death_part_color = "//INJECT";
+            string cur_flare_recolor = "//INJECT";
             Dictionary<string,string> stupid_workaround = new Dictionary<string, string>();
             CreateScriptFromKVP(data, "scr_set_character", "gml_Script_scr_set_character", 1);
             
@@ -200,6 +202,7 @@ namespace WYSCustomCharacterAPI
                 cur_move_gml = Conviences.AttachInject(cur_move_gml, curchar, "Physics", true, "//INJECT PHYSICS", i.ToString());
                 cur_move_gml = Conviences.AttachInject(cur_move_gml, curchar, "Collisions", true, "//INJECT COLLISIONS", i.ToString());
                 cur_darkflare = Conviences.AttachInjectNoCharacter(cur_darkflare, "image_blend = " + curchar.flareColor, true, "//INJECT", i.ToString());
+                cur_flare_recolor = Conviences.AttachInjectNoCharacter(cur_flare_recolor, GMLkvp["FlareColScript"].Replace("SNAILCOL",curchar.mainColor), true, "//INJECT", i.ToString());
                 cur_trail_part_color = Conviences.AttachInjectNoCharacter(cur_trail_part_color, "part_type_color1(global.part_type_playerTrail," + curchar.trailColor + ")", true, "//INJECT", i.ToString());
                 cur_death_part_color = Conviences.AttachInjectNoCharacter(cur_death_part_color, GMLkvp["DeathColScript"].Replace("DEATHCOL",curchar.deathColor), true, "//INJECT", i.ToString());
                 cur_gml = Conviences.AttachInject(cur_gml, curchar, "Initialization", false, "//INJECT", i.ToString());
@@ -239,6 +242,8 @@ namespace WYSCustomCharacterAPI
             data.Code.ByName("gml_Object_obj_player_Step_0").AppendGMLSafe("scr_autowhobble_update()\n" + cur_step_gml,data);
 
             data.Code.ByName("gml_Object_obj_player_Step_0").AppendGMLSafe(cur_trail_part_color, data);
+
+            data.Code.ByName("gml_Object_obj_player_Step_0").AppendGMLSafe(cur_flare_recolor, data);
 
             data.Code.ByName("gml_Object_obj_player_Step_0").AppendGMLSafe(cur_death_part_color, data);
 
