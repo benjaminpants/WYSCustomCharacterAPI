@@ -98,6 +98,7 @@ namespace WYSCustomCharacterAPI
             List<CustomCharacter> chars = new List<CustomCharacter>();
             foreach (string path in Directory.GetDirectories(characterfolder))
             {
+                Logger.Log("Adding:" + path);
                 if (File.Exists(Path.Combine(path,"character.json")))
                 {
                     CustomCharacter charac = JsonConvert.DeserializeObject<CustomCharacter>(File.ReadAllText(Path.Combine(path, "character.json")));
@@ -134,7 +135,7 @@ namespace WYSCustomCharacterAPI
             string gmlfolder = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "GMLSource");
             string charactersfolder = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "Characters");
             #pragma warning restore CS8604
-            CustomCharacters = LoadCharacters(charactersfolder);
+            LoadCustomCharacters(charactersfolder);
             LoadGMLFolder(gmlfolder);
 
             LoadGMLFolder(Path.Combine(gmlfolder, "Scripts"));

@@ -1,1 +1,0 @@
-draw_sprite_ext(spr_ball,0,x, y, (((lookdir * 0.5) * image_xscale) * aw_OUT_xscale), ((image_yscale * 0.5) * aw_OUT_yscale), (image_angle + aw_OUT_angle), inside_col, 1)
