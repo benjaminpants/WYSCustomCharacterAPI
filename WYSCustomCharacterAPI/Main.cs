@@ -49,6 +49,8 @@ namespace WYSCustomCharacterAPI
 
         public static List<CustomCharacter> CustomCharacters = new List<CustomCharacter>();
 
+        public static List<string> DisabledIDs = new List<string>();
+
         public static string DefaultCharacterID = "shelly";
 
         public static Dictionary<string, string> DictionarizeGMLFolder(string gmlfolder)
@@ -155,7 +157,8 @@ namespace WYSCustomCharacterAPI
             {{
                 global.current_character = {CustomCharacters.IndexOf(CustomCharacters.First(x => x.id == DefaultCharacterID))};
             }}
-            scr_autowhobble_ini()", data);
+            scr_autowhobble_ini()
+            global.char_reset_ini = false", data);
 
             string cur_gml = GMLkvp["gml_Script_scr_move_like_a_snail_ini"];
             string cur_move_gml = GMLkvp["gml_Script_scr_move_like_a_snail"];
@@ -166,12 +169,17 @@ namespace WYSCustomCharacterAPI
             string cur_trail_part_color = "//INJECT";
             string cur_death_part_color = "//INJECT";
             string cur_flare_recolor = "//INJECT";
+            string cur_spotlight = GMLkvp["gml_Object_obj_spotlight_drawer_Draw_0"];
             Dictionary<string,string> stupid_workaround = new Dictionary<string, string>();
             CreateScriptFromKVP(data, "scr_set_character", "gml_Script_scr_set_character", 1);
             
             for (int i = 0; i < CustomCharacters.Count; i++)
             {
                 CustomCharacter curchar = CustomCharacters[i];
+                if (DisabledIDs.Contains(curchar.id))
+                {
+                    continue;
+                }
                 options.Add(new Menus.WysMenuOption(new UndertaleString(curchar.name).ToString())
                 {
                     tooltipScript = Menus.Vanilla.Tooltips.Text,
@@ -206,6 +214,7 @@ namespace WYSCustomCharacterAPI
                 cur_flare_recolor = Conviences.AttachInjectNoCharacter(cur_flare_recolor, GMLkvp["FlareColScript"].Replace("SNAILCOL",curchar.mainColor), true, "//INJECT", i.ToString());
                 cur_trail_part_color = Conviences.AttachInjectNoCharacter(cur_trail_part_color, "part_type_color1(global.part_type_playerTrail," + curchar.trailColor + ")", true, "//INJECT", i.ToString());
                 cur_death_part_color = Conviences.AttachInjectNoCharacter(cur_death_part_color, GMLkvp["DeathColScript"].Replace("DEATHCOL",curchar.deathColor), true, "//INJECT", i.ToString());
+                cur_spotlight = Conviences.AttachInjectNoCharacter(cur_spotlight, GMLkvp["SpotlightCol"].Replace("MAINCOL", curchar.mainColor).Replace("FLARECOL", curchar.flareColor), true, "//INJECT", i.ToString());
                 cur_gml = Conviences.AttachInject(cur_gml, curchar, "Initialization", false, "//INJECT", i.ToString());
                 cur_step_gml = Conviences.AttachInject(cur_step_gml, curchar, "StepEnd", true, "//INJECT", i.ToString());
                 cur_draw_gml = Conviences.AttachInject(cur_draw_gml, curchar, "Draw", true, "//INJECT", i.ToString());
@@ -250,6 +259,8 @@ namespace WYSCustomCharacterAPI
 
 
             Hooker.ReplaceGmlSafe(data.Code.ByName("gml_GlobalScript_scr_move_like_a_snail_ini"), cur_gml);
+
+            Hooker.ReplaceGmlSafe(data.Code.ByName("gml_Object_obj_spotlight_drawer_Draw_0"), cur_spotlight);
 
             Hooker.ReplaceGmlSafe(data.Code.ByName("gml_Object_obj_darkFollowFlare_Step_0"), cur_darkflare);
 
