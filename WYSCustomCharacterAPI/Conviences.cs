@@ -66,9 +66,13 @@ namespace WYSCustomCharacterAPI
                 Logger.Log("Failsafe does not have:" + key, Logger.LogLevel.Warn);
                 return gml;
             }
+            else if (chara.overrideOnly && (key == "Jump" || key == "Physics" || key == "Collisions"))
+            {
+                Logger.Log("Ignoring key: " + key + " because overrideOnly is enabled", Logger.LogLevel.Debug);
+            }
             else
             {
-                return AttachInject(gml, WYSCustomCharacterAPI.GameMakerMod.CustomCharacters.First(x => x.id == "shelly"), key, addconditional, injectosearch, enumreplace, true); //default to shelly
+                return AttachInject(gml, WYSCustomCharacterAPI.GameMakerMod.CustomCharacters.First(x => x.id == chara.parentCharacter), key, addconditional, injectosearch, enumreplace, true); //default to shelly
             }
             return gml;
         }

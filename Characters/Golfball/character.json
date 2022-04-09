@@ -3,6 +3,7 @@
 	"name":"Golfball",
 	"description":"Why go outside and golf when you can stay here and golf?",
 	"allowSnailLines":false,
+	"overrideOnly":true,
 	"useSlitherSound":false,
 	"useSnailVoice":false,
 	"renderEyes":false,

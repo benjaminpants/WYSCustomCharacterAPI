@@ -13,6 +13,10 @@ if (golfball_current_phase == 0)
 	{
 		golfball_current_angle = point_direction(x,y,mouse_x,mouse_y)
 	}
+	else if (object_index == obj_evil_snail)
+	{
+		golfball_current_angle = point_direction(obj_player.x,obj_player.y,mouse_x,mouse_y) + 180
+	}
 	else
 	{
 		golfball_current_angle = point_direction(x,y,x + irandom_range(-300,300),y + irandom_range(-300,300))
@@ -44,6 +48,11 @@ if (golfball_current_phase == 0)
 		{
 			golfball_current_strength *= 0.6
 		}
+	}
+	
+	if (object_index == obj_evil_snail)
+	{
+		golfball_current_strength *= 0.98
 	}
 
 	if (inputjumppress)

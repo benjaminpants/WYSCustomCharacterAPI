@@ -16,9 +16,13 @@ namespace WYSCustomCharacterAPI
     public class CustomCharacter
     {
         public string id = "placeholder";
+        public string parentCharacter = "shelly";
+        public bool overrideOnly = false;
         public string name = "placeholder";
         public string description = "placeholder";
         public string trailColor = "c_white";
+        public string flareColor = "c_white";
+        public string deathColor = "c_white";
         public bool allowSnailLines = true;
         public bool useSnailVoice = true;
         public bool useSlitherSound = true;
@@ -44,6 +48,8 @@ namespace WYSCustomCharacterAPI
 
         public static List<CustomCharacter> CustomCharacters = new List<CustomCharacter>();
 
+        public static string DefaultCharacterID = "shelly";
+
         public static Dictionary<string, string> DictionarizeGMLFolder(string gmlfolder)
         {
             Dictionary<string, string> Dict = new Dictionary<string, string>();
@@ -60,6 +66,7 @@ namespace WYSCustomCharacterAPI
                     {
                         Console.WriteLine("Reading File: " + fo.Name);
                         Dict.Add(Path.GetFileNameWithoutExtension(fo.Name), File.ReadAllText(infos[i]));
+                        Patcher.AddFileToCache(0, infos[i]);
                     }
                 }
             }
@@ -76,6 +83,7 @@ namespace WYSCustomCharacterAPI
 
         public static bool LoadGMLFolder(string gmlfolder)
         {
+            Logger.Log("Trying to add:" + gmlfolder);
             Dictionary<string, string> dict = DictionarizeGMLFolder(gmlfolder);
             foreach (KeyValuePair<string, string> kvp in dict)
             {
@@ -84,7 +92,7 @@ namespace WYSCustomCharacterAPI
             return dict.Count != 0;
         }
 
-        public static List<CustomCharacter> LoadCharacters(string characterfolder)
+        private static List<CustomCharacter> LoadCharacters(string characterfolder)
         {
             List<CustomCharacter> chars = new List<CustomCharacter>();
             foreach (string path in Directory.GetDirectories(characterfolder))
@@ -93,31 +101,49 @@ namespace WYSCustomCharacterAPI
                 {
                     CustomCharacter charac = JsonConvert.DeserializeObject<CustomCharacter>(File.ReadAllText(Path.Combine(path, "character.json")));
                     charac.Scripts = DictionarizeGMLFolder(Path.Combine(path, "Scripts"));
+                    Patcher.AddFileToCache(0, Path.Combine(path, "character.json"));
                     chars.Add(charac);
                 }
             }
             return chars;
         }
 
-
-        public void Load(int audioGroup, ModData currentMod)
+        public static bool LoadCustomCharacters(string characterfolder)
         {
-            UndertaleData data = Patcher.data;
+            try
+            {
+                CustomCharacters.AddRange(LoadCharacters(characterfolder));
+                return true;
+            }
+            catch(Exception e)
+            {
+                Logger.Log(e.Message,Logger.LogLevel.Error);
+                return false;
+            }
+        }
+
+
+        
+
+
+        public void Load(int audioGroup, ModData currentmod)
+        {
             if (audioGroup != 0) return;
-            GDC = new GlobalDecompileContext(data, false);
-            //supress vs being stupid
             #pragma warning disable CS8604
             string gmlfolder = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "GMLSource");
             string charactersfolder = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "Characters");
             #pragma warning restore CS8604
-
-
-
+            CustomCharacters = LoadCharacters(charactersfolder);
             LoadGMLFolder(gmlfolder);
 
             LoadGMLFolder(Path.Combine(gmlfolder, "Scripts"));
+        }
 
-            CustomCharacters = LoadCharacters(charactersfolder);
+        public void LateLoad(int audioGroup, ModData currentMod)
+        {
+            UndertaleData data = Patcher.data;
+            if (audioGroup != 0) return;
+            GDC = new GlobalDecompileContext(data, false);
 
 
             List<Menus.WysMenuOption> options = new List<Menus.WysMenuOption>();
@@ -125,7 +151,7 @@ namespace WYSCustomCharacterAPI
             data.Code.ByName("gml_Object_obj_player_Create_0").AppendGMLSafe($@"
             if (!variable_global_exists(""current_character""))
             {{
-                global.current_character = {CustomCharacters.IndexOf(CustomCharacters.First(x => x.id == "shelly"))};
+                global.current_character = {CustomCharacters.IndexOf(CustomCharacters.First(x => x.id == DefaultCharacterID))};
             }}
             scr_autowhobble_ini()", data);
 
@@ -133,6 +159,10 @@ namespace WYSCustomCharacterAPI
             string cur_move_gml = GMLkvp["gml_Script_scr_move_like_a_snail"];
             string cur_draw_gml = GMLkvp["gml_Object_obj_player_Draw_0"];
             string cur_step_gml = "//INJECT";
+            string cur_evil_draw_gml = "//INJECT";
+            string cur_darkflare = GMLkvp["gml_Object_obj_darkFollowFlare_Step_0"];
+            string cur_trail_part_color = "//INJECT";
+            string cur_death_part_color = "//INJECT";
             Dictionary<string,string> stupid_workaround = new Dictionary<string, string>();
             CreateScriptFromKVP(data, "scr_set_character", "gml_Script_scr_set_character", 1);
             
@@ -169,9 +199,13 @@ namespace WYSCustomCharacterAPI
                 cur_move_gml = Conviences.AttachInject(cur_move_gml, curchar, "Jump", true, "//INJECT JUMP", i.ToString());
                 cur_move_gml = Conviences.AttachInject(cur_move_gml, curchar, "Physics", true, "//INJECT PHYSICS", i.ToString());
                 cur_move_gml = Conviences.AttachInject(cur_move_gml, curchar, "Collisions", true, "//INJECT COLLISIONS", i.ToString());
+                cur_darkflare = Conviences.AttachInjectNoCharacter(cur_darkflare, "image_blend = " + curchar.flareColor, true, "//INJECT", i.ToString());
+                cur_trail_part_color = Conviences.AttachInjectNoCharacter(cur_trail_part_color, "part_type_color1(global.part_type_playerTrail," + curchar.trailColor + ")", true, "//INJECT", i.ToString());
+                cur_death_part_color = Conviences.AttachInjectNoCharacter(cur_death_part_color, GMLkvp["DeathColScript"].Replace("DEATHCOL",curchar.deathColor), true, "//INJECT", i.ToString());
                 cur_gml = Conviences.AttachInject(cur_gml, curchar, "Initialization", false, "//INJECT", i.ToString());
                 cur_step_gml = Conviences.AttachInject(cur_step_gml, curchar, "StepEnd", true, "//INJECT", i.ToString());
                 cur_draw_gml = Conviences.AttachInject(cur_draw_gml, curchar, "Draw", true, "//INJECT", i.ToString());
+                cur_evil_draw_gml = Conviences.AttachInject(cur_evil_draw_gml, curchar, "Evil_Draw", true, "//INJECT", i.ToString());
                 data.Code.ByName("gml_Object_obj_player_Create_0").AppendGMLSafe(curchar.Scripts.ContainsKey("Create") ? curchar.Scripts["Create"] : "", data);
                 
                 
@@ -204,15 +238,21 @@ namespace WYSCustomCharacterAPI
 
             data.Code.ByName("gml_Object_obj_player_Step_0").AppendGMLSafe("scr_autowhobble_update()\n" + cur_step_gml,data);
 
+            data.Code.ByName("gml_Object_obj_player_Step_0").AppendGMLSafe(cur_trail_part_color, data);
+
+            data.Code.ByName("gml_Object_obj_player_Step_0").AppendGMLSafe(cur_death_part_color, data);
+
 
             Hooker.ReplaceGmlSafe(data.Code.ByName("gml_GlobalScript_scr_move_like_a_snail_ini"), cur_gml);
+
+            Hooker.ReplaceGmlSafe(data.Code.ByName("gml_Object_obj_darkFollowFlare_Step_0"), cur_darkflare);
+
+            Hooker.ReplaceGmlSafe(data.Code.ByName("gml_Object_obj_evil_snail_Draw_0"), cur_evil_draw_gml);
 
             Hooker.ReplaceGmlSafe(data.Code.ByName("gml_Object_obj_player_Draw_0"), cur_draw_gml);
 
 
             Hooker.ReplaceGmlSafe(data.Code.ByName("gml_GlobalScript_scr_move_like_a_snail"), cur_move_gml);
-
-
 
 
             UndertaleGameObject charactersMenu = Menus.CreateMenu("Mods",options.ToArray());

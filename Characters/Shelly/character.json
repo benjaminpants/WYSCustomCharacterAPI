@@ -13,6 +13,8 @@
 	"conveyorMultiplier":1,
 	"bubbleScale":1,
 	"trailColor":"obj_levelstyler.col_player_trail",
+	"flareColor":"obj_levelstyler.col_snail_flare",
+	"deathColor":"obj_levelstyler.col_snail_death",
 	"jumps":2
 
 
