@@ -205,7 +205,9 @@ namespace WYSCustomCharacterAPI
                 underwater_friction = {curchar.underwaterFriction}
                 trail_color = {curchar.trailColor}
                 use_voice = {curchar.useSnailVoice.ToString().ToLower()}
-                chbubble_scale = {curchar.bubbleScale}", true, "//INJECT MULTIPLIERS", i.ToString());
+                chbubble_scale = {curchar.bubbleScale}
+                //INJECT CUSTOM MULTS", true, "//INJECT MULTIPLIERS", i.ToString());
+                cur_move_gml = Conviences.AttachInject(cur_move_gml, curchar, "Multipliers", false, "//INJECT CUSTOM MULTS", i.ToString(), false, false);
                 cur_move_gml = Conviences.AttachInject(cur_move_gml, curchar, "Override", true, "//INJECT COMPLETE OVERRIDE", i.ToString());
                 cur_move_gml = Conviences.AttachInject(cur_move_gml, curchar, "Jump", true, "//INJECT JUMP", i.ToString());
                 cur_move_gml = Conviences.AttachInject(cur_move_gml, curchar, "Physics", true, "//INJECT PHYSICS", i.ToString());

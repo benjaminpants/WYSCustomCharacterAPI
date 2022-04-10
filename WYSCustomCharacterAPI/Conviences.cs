@@ -50,12 +50,12 @@ namespace WYSCustomCharacterAPI
 
         }
         
-        public static string AttachInject(string gml, CustomCharacter chara, string key, bool addconditional, string injectosearch, string enumreplace = "", bool failsafe = false)
+        public static string AttachInject(string gml, CustomCharacter chara, string key, bool addconditional, string injectosearch, string enumreplace = "", bool failsafe = false, bool auto_add = true)
         {
             if (chara.Scripts.ContainsKey(key))
             {
                 string to_add = addconditional == false ? chara.Scripts[key] : "if (global.current_character == ENUM_CHARACTERID)\n{\n" + chara.Scripts[key] + "\n}";
-                gml = gml.Replace(injectosearch, to_add + "\n" + injectosearch);
+                gml = gml.Replace(injectosearch, to_add + (auto_add ? "\n" + injectosearch : ""));
                 if (enumreplace != "")
                 {
                     gml = gml.Replace("ENUM_CHARACTERID",enumreplace);
