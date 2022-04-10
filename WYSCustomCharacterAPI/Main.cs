@@ -6,6 +6,7 @@ using System.Linq;
 using System;
 using WysApi.Api;
 using System.IO;
+using TSIMPH;
 using Newtonsoft.Json;
 using UndertaleModLib.Decompiler;
 using System.Reflection;
@@ -158,7 +159,7 @@ namespace WYSCustomCharacterAPI
                 global.current_character = {CustomCharacters.IndexOf(CustomCharacters.First(x => x.id == DefaultCharacterID))};
             }}
             scr_autowhobble_ini()
-            global.char_reset_ini = false", data);
+            global.char_reset_ini = false");
 
             string cur_gml = GMLkvp["gml_Script_scr_move_like_a_snail_ini"];
             string cur_move_gml = GMLkvp["gml_Script_scr_move_like_a_snail"];
@@ -189,14 +190,14 @@ namespace WYSCustomCharacterAPI
                 });
                 if (!curchar.renderEyes)
                 {
-                    Conviences.PrependCode(data, "gml_Object_obj_snaili_eye_Draw_0", $@"
+                    Conviences.PrependCode("gml_Object_obj_snaili_eye_Draw_0", $@"
                         if (global.current_character == {i})
                         {{
                             return false;
                         }}
                     ");
                 }
-                cur_move_gml = Conviences.AttachInjectNoCharacter(cur_move_gml, $@"
+                cur_move_gml = Injects.AttachInjectNoCharacter(cur_move_gml, $@"
                 speed_multiplier = {curchar.speedMultiplier}
 	            gravity_multiplier = {curchar.gravityMultiplier}
 	            jump_multiplier = {curchar.jumpMultiplier}
@@ -207,21 +208,21 @@ namespace WYSCustomCharacterAPI
                 use_voice = {curchar.useSnailVoice.ToString().ToLower()}
                 chbubble_scale = {curchar.bubbleScale}
                 //INJECT CUSTOM MULTS", true, "//INJECT MULTIPLIERS", i.ToString());
-                cur_move_gml = Conviences.AttachInject(cur_move_gml, curchar, "Multipliers", false, "//INJECT CUSTOM MULTS", i.ToString(), false, false);
-                cur_move_gml = Conviences.AttachInject(cur_move_gml, curchar, "Override", true, "//INJECT COMPLETE OVERRIDE", i.ToString());
-                cur_move_gml = Conviences.AttachInject(cur_move_gml, curchar, "Jump", true, "//INJECT JUMP", i.ToString());
-                cur_move_gml = Conviences.AttachInject(cur_move_gml, curchar, "Physics", true, "//INJECT PHYSICS", i.ToString());
-                cur_move_gml = Conviences.AttachInject(cur_move_gml, curchar, "Collisions", true, "//INJECT COLLISIONS", i.ToString());
-                cur_darkflare = Conviences.AttachInjectNoCharacter(cur_darkflare, "image_blend = " + curchar.flareColor, true, "//INJECT", i.ToString());
-                cur_flare_recolor = Conviences.AttachInjectNoCharacter(cur_flare_recolor, GMLkvp["FlareColScript"].Replace("SNAILCOL",curchar.mainColor), true, "//INJECT", i.ToString());
-                cur_trail_part_color = Conviences.AttachInjectNoCharacter(cur_trail_part_color, "part_type_color1(global.part_type_playerTrail," + curchar.trailColor + ")", true, "//INJECT", i.ToString());
-                cur_death_part_color = Conviences.AttachInjectNoCharacter(cur_death_part_color, GMLkvp["DeathColScript"].Replace("DEATHCOL",curchar.deathColor), true, "//INJECT", i.ToString());
-                cur_spotlight = Conviences.AttachInjectNoCharacter(cur_spotlight, GMLkvp["SpotlightCol"].Replace("MAINCOL", curchar.mainColor).Replace("FLARECOL", curchar.flareColor), true, "//INJECT", i.ToString());
-                cur_gml = Conviences.AttachInject(cur_gml, curchar, "Initialization", false, "//INJECT", i.ToString());
-                cur_step_gml = Conviences.AttachInject(cur_step_gml, curchar, "StepEnd", true, "//INJECT", i.ToString());
-                cur_draw_gml = Conviences.AttachInject(cur_draw_gml, curchar, "Draw", true, "//INJECT", i.ToString());
-                cur_evil_draw_gml = Conviences.AttachInject(cur_evil_draw_gml, curchar, "Evil_Draw", true, "//INJECT", i.ToString());
-                data.Code.ByName("gml_Object_obj_player_Create_0").AppendGMLSafe(curchar.Scripts.ContainsKey("Create") ? curchar.Scripts["Create"] : "", data);
+                cur_move_gml = Injects.AttachInject(cur_move_gml, curchar, "Multipliers", false, "//INJECT CUSTOM MULTS", i.ToString(), false, false);
+                cur_move_gml = Injects.AttachInject(cur_move_gml, curchar, "Override", true, "//INJECT COMPLETE OVERRIDE", i.ToString());
+                cur_move_gml = Injects.AttachInject(cur_move_gml, curchar, "Jump", true, "//INJECT JUMP", i.ToString());
+                cur_move_gml = Injects.AttachInject(cur_move_gml, curchar, "Physics", true, "//INJECT PHYSICS", i.ToString());
+                cur_move_gml = Injects.AttachInject(cur_move_gml, curchar, "Collisions", true, "//INJECT COLLISIONS", i.ToString());
+                cur_darkflare = Injects.AttachInjectNoCharacter(cur_darkflare, "image_blend = " + curchar.flareColor, true, "//INJECT", i.ToString());
+                cur_flare_recolor = Injects.AttachInjectNoCharacter(cur_flare_recolor, GMLkvp["FlareColScript"].Replace("SNAILCOL",curchar.mainColor), true, "//INJECT", i.ToString());
+                cur_trail_part_color = Injects.AttachInjectNoCharacter(cur_trail_part_color, "part_type_color1(global.part_type_playerTrail," + curchar.trailColor + ")", true, "//INJECT", i.ToString());
+                cur_death_part_color = Injects.AttachInjectNoCharacter(cur_death_part_color, GMLkvp["DeathColScript"].Replace("DEATHCOL",curchar.deathColor), true, "//INJECT", i.ToString());
+                cur_spotlight = Injects.AttachInjectNoCharacter(cur_spotlight, GMLkvp["SpotlightCol"].Replace("MAINCOL", curchar.mainColor).Replace("FLARECOL", curchar.flareColor), true, "//INJECT", i.ToString());
+                cur_gml = Injects.AttachInject(cur_gml, curchar, "Initialization", false, "//INJECT", i.ToString());
+                cur_step_gml = Injects.AttachInject(cur_step_gml, curchar, "StepEnd", true, "//INJECT", i.ToString());
+                cur_draw_gml = Injects.AttachInject(cur_draw_gml, curchar, "Draw", true, "//INJECT", i.ToString());
+                cur_evil_draw_gml = Injects.AttachInject(cur_evil_draw_gml, curchar, "Evil_Draw", true, "//INJECT", i.ToString());
+                data.Code.ByName("gml_Object_obj_player_Create_0").AppendGMLSafe(curchar.Scripts.ContainsKey("Create") ? curchar.Scripts["Create"] : "");
                 
                 
                 //Get all the Scripts in the character that begin with "Collision_"
@@ -234,11 +235,11 @@ namespace WYSCustomCharacterAPI
                         string ind = "gml_Object_obj_player_" + item.Key;
                         if (stupid_workaround.ContainsKey(ind))
                         {
-                            stupid_workaround[ind] = Conviences.AttachInject(stupid_workaround[ind], curchar, item.Key, false, "//INJECT", i.ToString());
+                            stupid_workaround[ind] = Injects.AttachInject(stupid_workaround[ind], curchar, item.Key, false, "//INJECT", i.ToString());
                         }
                         else
                         {
-                            stupid_workaround.Add(ind, Conviences.AttachInject("//INJECT", curchar, item.Key, false, "//INJECT", i.ToString()));
+                            stupid_workaround.Add(ind, Injects.AttachInject("//INJECT", curchar, item.Key, false, "//INJECT", i.ToString()));
                         }
                     }
                 }
@@ -251,13 +252,13 @@ namespace WYSCustomCharacterAPI
                 Hooker.HookCode(item.Key, item.Value + "\n#orig#()"); //only reason I do it like this is to keep consistency
             }
 
-            data.Code.ByName("gml_Object_obj_player_Step_0").AppendGMLSafe("scr_autowhobble_update()\n" + cur_step_gml,data);
+            data.Code.ByName("gml_Object_obj_player_Step_0").AppendGMLSafe("scr_autowhobble_update()\n" + cur_step_gml);
 
-            data.Code.ByName("gml_Object_obj_player_Step_0").AppendGMLSafe(cur_trail_part_color, data);
+            data.Code.ByName("gml_Object_obj_player_Step_0").AppendGMLSafe(cur_trail_part_color);
 
-            data.Code.ByName("gml_Object_obj_player_Step_0").AppendGMLSafe(cur_flare_recolor, data);
+            data.Code.ByName("gml_Object_obj_player_Step_0").AppendGMLSafe(cur_flare_recolor);
 
-            data.Code.ByName("gml_Object_obj_player_Step_0").AppendGMLSafe(cur_death_part_color, data);
+            data.Code.ByName("gml_Object_obj_player_Step_0").AppendGMLSafe(cur_death_part_color);
 
 
             Hooker.ReplaceGmlSafe(data.Code.ByName("gml_GlobalScript_scr_move_like_a_snail_ini"), cur_gml);
@@ -286,7 +287,7 @@ namespace WYSCustomCharacterAPI
         
         public static UndertaleScript CreateScriptFromKVP(UndertaleData data, string name, string key, ushort arguments)
         {
-            return data.CreateScript(name, GMLkvp[key], arguments);
+            return Hooker.CreateLegacyScript(name, GMLkvp[key], arguments);
         }
     }
 }

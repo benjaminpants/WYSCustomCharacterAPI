@@ -16,6 +16,9 @@
     <Reference Include="Newtonsoft.Json">
       <HintPath>..\Dependencies\Newtonsoft.Json.dll</HintPath>
     </Reference>
+    <Reference Include="TSIMPH_API">
+      <HintPath>..\..\WillYouGolf\Dependencies\TSIMPH_API.dll</HintPath>
+    </Reference>
     <Reference Include="UndertaleModLib">
       <HintPath>..\Dependencies\UndertaleModLib.dll</HintPath>
     </Reference>
