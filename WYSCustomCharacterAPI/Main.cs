@@ -10,6 +10,7 @@ using TSIMPH;
 using Newtonsoft.Json;
 using UndertaleModLib.Decompiler;
 using System.Reflection;
+using System.Globalization;
 
 namespace WYSCustomCharacterAPI
 {
@@ -198,15 +199,15 @@ namespace WYSCustomCharacterAPI
                     ");
                 }
                 cur_move_gml = Injects.AttachInjectNoCharacter(cur_move_gml, $@"
-                speed_multiplier = {curchar.speedMultiplier}
-	            gravity_multiplier = {curchar.gravityMultiplier}
-	            jump_multiplier = {curchar.jumpMultiplier}
-	            jump_count = {curchar.jumps}
-	            conveyor_multiplier = {curchar.conveyorMultiplier}
-                underwater_friction = {curchar.underwaterFriction}
+                speed_multiplier = {curchar.speedMultiplier.ToString(CultureInfo.InvariantCulture)};
+	            gravity_multiplier = {curchar.gravityMultiplier.ToString(CultureInfo.InvariantCulture)}
+	            jump_multiplier = {curchar.jumpMultiplier.ToString(CultureInfo.InvariantCulture)}
+	            jump_count = {curchar.jumps.ToString(CultureInfo.InvariantCulture)}
+	            conveyor_multiplier = {curchar.conveyorMultiplier.ToString(CultureInfo.InvariantCulture)}
+                underwater_friction = {curchar.underwaterFriction.ToString(CultureInfo.InvariantCulture)}
                 trail_color = {curchar.trailColor}
                 use_voice = {curchar.useSnailVoice.ToString().ToLower()}
-                chbubble_scale = {curchar.bubbleScale}
+                chbubble_scale = {curchar.bubbleScale.ToString(CultureInfo.InvariantCulture)}
                 //INJECT CUSTOM MULTS", true, "//INJECT MULTIPLIERS", i.ToString());
                 cur_move_gml = Injects.AttachInject(cur_move_gml, curchar, "Multipliers", false, "//INJECT CUSTOM MULTS", i.ToString(), false, false);
                 cur_move_gml = Injects.AttachInject(cur_move_gml, curchar, "Override", true, "//INJECT COMPLETE OVERRIDE", i.ToString());
