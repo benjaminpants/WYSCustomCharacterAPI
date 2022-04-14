@@ -132,7 +132,7 @@ namespace WYSCustomCharacterAPI
         
 
 
-        public void Load(int audioGroup, ModData currentmod)
+        public void Load(int audioGroup, UndertaleData data, ModData currentmod)
         {
             if (audioGroup != 0) return;
             #pragma warning disable CS8604
@@ -145,22 +145,21 @@ namespace WYSCustomCharacterAPI
             LoadGMLFolder(Path.Combine(gmlfolder, "Scripts"));
         }
 
-        public void LateLoad(int audioGroup, ModData currentMod)
+        public void LateLoad(int audioGroup, UndertaleData data, ModData currentMod)
         {
-            UndertaleData data = Patcher.data;
             if (audioGroup != 0) return;
             GDC = new GlobalDecompileContext(data, false);
-
+            
 
             List<Menus.WysMenuOption> options = new List<Menus.WysMenuOption>();
             
-            data.Code.ByName("gml_Object_obj_player_Create_0").AppendGMLSafe($@"
+            data.Code.ByName("gml_Object_obj_player_Create_0").AppendGmlSafe($@"
             if (!variable_global_exists(""current_character""))
             {{
                 global.current_character = {CustomCharacters.IndexOf(CustomCharacters.First(x => x.id == DefaultCharacterID))};
             }}
             scr_autowhobble_ini()
-            global.char_reset_ini = false");
+            global.char_reset_ini = false", data);
 
             string cur_gml = GMLkvp["gml_Script_scr_move_like_a_snail_ini"];
             string cur_move_gml = GMLkvp["gml_Script_scr_move_like_a_snail"];
@@ -196,7 +195,7 @@ namespace WYSCustomCharacterAPI
                         {{
                             return false;
                         }}
-                    ");
+                    ", data);
                 }
                 cur_move_gml = Injects.AttachInjectNoCharacter(cur_move_gml, $@"
                 speed_multiplier = {curchar.speedMultiplier.ToString(CultureInfo.InvariantCulture)};
@@ -223,7 +222,7 @@ namespace WYSCustomCharacterAPI
                 cur_step_gml = Injects.AttachInject(cur_step_gml, curchar, "StepEnd", true, "//INJECT", i.ToString());
                 cur_draw_gml = Injects.AttachInject(cur_draw_gml, curchar, "Draw", true, "//INJECT", i.ToString());
                 cur_evil_draw_gml = Injects.AttachInject(cur_evil_draw_gml, curchar, "Evil_Draw", true, "//INJECT", i.ToString());
-                data.Code.ByName("gml_Object_obj_player_Create_0").AppendGMLSafe(curchar.Scripts.ContainsKey("Create") ? curchar.Scripts["Create"] : "");
+                data.Code.ByName("gml_Object_obj_player_Create_0").AppendGmlSafe(curchar.Scripts.ContainsKey("Create") ? curchar.Scripts["Create"] : "", data);
                 
                 
                 //Get all the Scripts in the character that begin with "Collision_"
@@ -250,35 +249,35 @@ namespace WYSCustomCharacterAPI
 
             foreach (KeyValuePair<string,string> item in stupid_workaround)
             {
-                Hooker.HookCode(item.Key, item.Value + "\n#orig#()"); //only reason I do it like this is to keep consistency
+                data.HookCode(item.Key, item.Value + "\n#orig#()"); //only reason I do it like this is to keep consistency
             }
 
-            data.Code.ByName("gml_Object_obj_player_Step_0").AppendGMLSafe("scr_autowhobble_update()\n" + cur_step_gml);
+            data.Code.ByName("gml_Object_obj_player_Step_0").AppendGmlSafe("scr_autowhobble_update()\n" + cur_step_gml, data);
 
-            data.Code.ByName("gml_Object_obj_player_Step_0").AppendGMLSafe(cur_trail_part_color);
+            data.Code.ByName("gml_Object_obj_player_Step_0").AppendGmlSafe(cur_trail_part_color, data);
 
-            data.Code.ByName("gml_Object_obj_player_Step_0").AppendGMLSafe(cur_flare_recolor);
-
-            data.Code.ByName("gml_Object_obj_player_Step_0").AppendGMLSafe(cur_death_part_color);
-
-
-            Hooker.ReplaceGmlSafe(data.Code.ByName("gml_GlobalScript_scr_move_like_a_snail_ini"), cur_gml);
-
-            Hooker.ReplaceGmlSafe(data.Code.ByName("gml_Object_obj_spotlight_drawer_Draw_0"), cur_spotlight);
-
-            Hooker.ReplaceGmlSafe(data.Code.ByName("gml_Object_obj_darkFollowFlare_Step_0"), cur_darkflare);
-
-            Hooker.ReplaceGmlSafe(data.Code.ByName("gml_Object_obj_evil_snail_Draw_0"), cur_evil_draw_gml);
-
-            Hooker.ReplaceGmlSafe(data.Code.ByName("gml_Object_obj_player_Draw_0"), cur_draw_gml);
+            data.Code.ByName("gml_Object_obj_player_Step_0").AppendGmlSafe(cur_flare_recolor, data);
+            
+            data.Code.ByName("gml_Object_obj_player_Step_0").AppendGmlSafe(cur_death_part_color, data);
 
 
-            Hooker.ReplaceGmlSafe(data.Code.ByName("gml_GlobalScript_scr_move_like_a_snail"), cur_move_gml);
+            data.Code.ByName("gml_GlobalScript_scr_move_like_a_snail_ini").ReplaceGmlSafe(cur_gml, data);
+
+            data.Code.ByName("gml_Object_obj_spotlight_drawer_Draw_0").ReplaceGmlSafe(cur_spotlight, data);
+
+            data.Code.ByName("gml_Object_obj_darkFollowFlare_Step_0").ReplaceGmlSafe(cur_darkflare, data);
+            
+            data.Code.ByName("gml_Object_obj_evil_snail_Draw_0").ReplaceGmlSafe(cur_evil_draw_gml, data);
+
+            data.Code.ByName("gml_Object_obj_player_Draw_0").ReplaceGmlSafe(cur_draw_gml, data);
+            
+
+            data.Code.ByName("gml_GlobalScript_scr_move_like_a_snail").ReplaceGmlSafe(cur_move_gml, data);
 
 
-            UndertaleGameObject charactersMenu = Menus.CreateMenu("Mods",options.ToArray());
+            UndertaleGameObject charactersMenu = Menus.CreateMenu(data, "Mods",options.ToArray());
 
-            Menus.InsertMenuOptionFromEnd(Menus.Vanilla.Gameplay, 1, new Menus.WysMenuOption("\"Characters\"")
+            Menus.InsertMenuOptionFromEnd(data, Menus.Vanilla.Gameplay, 1, new Menus.WysMenuOption("\"Characters\"")
             { 
                 instance = charactersMenu.Name.Content
             });
@@ -288,7 +287,7 @@ namespace WYSCustomCharacterAPI
         
         public static UndertaleScript CreateScriptFromKVP(UndertaleData data, string name, string key, ushort arguments)
         {
-            return Hooker.CreateLegacyScript(name, GMLkvp[key], arguments);
+            return data.CreateLegacyScript(name, GMLkvp[key], arguments);
         }
     }
 }
