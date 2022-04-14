@@ -12,6 +12,11 @@ namespace WYSCustomCharacterAPI
         
         public static string AttachInject(string gml, CustomCharacter chara, string key, bool addconditional, string injectosearch, string enumreplace = "", bool failsafe = false, bool auto_add = true)
         {
+            if (chara.overrideOnly && (key == "Jump" || key == "Physics" || key == "Collisions"))
+            {
+                Logger.Log("Ignoring key: " + key + " because overrideOnly is enabled", Logger.LogLevel.Debug);
+                return gml;
+            }
             if (chara.Scripts.ContainsKey(key))
             {
                 string to_add = addconditional == false ? chara.Scripts[key] : "if (global.current_character == ENUM_CHARACTERID)\n{\n" + chara.Scripts[key] + "\n}";
@@ -23,12 +28,12 @@ namespace WYSCustomCharacterAPI
             }
             else if (failsafe)
             {
+                if (chara.parentCharacter != chara.id)
+                {
+                    return AttachInject(gml, WYSCustomCharacterAPI.GameMakerMod.CustomCharacters.First(x => x.id == chara.parentCharacter), key, addconditional, injectosearch, enumreplace, true); //go down the chain
+                }
                 Logger.Log("Failsafe does not have:" + key, Logger.LogLevel.Warn);
                 return gml;
-            }
-            else if (chara.overrideOnly && (key == "Jump" || key == "Physics" || key == "Collisions"))
-            {
-                Logger.Log("Ignoring key: " + key + " because overrideOnly is enabled", Logger.LogLevel.Debug);
             }
             else
             {

@@ -159,7 +159,7 @@ namespace WYSCustomCharacterAPI
                 global.current_character = {CustomCharacters.IndexOf(CustomCharacters.First(x => x.id == DefaultCharacterID))};
             }}
             scr_autowhobble_ini()
-            global.char_reset_ini = false", data);
+            tracked_character = global.current_character", data);
 
             string cur_gml = GMLkvp["gml_Script_scr_move_like_a_snail_ini"];
             string cur_move_gml = GMLkvp["gml_Script_scr_move_like_a_snail"];
