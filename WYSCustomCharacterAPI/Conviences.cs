@@ -9,13 +9,21 @@ namespace WYSCustomCharacterAPI
     public static class Injects
     {
 
+        public static string ReplaceCharacterEnums(string gml)
+        {
+            foreach (CustomCharacter chr in WYSCustomCharacterAPI.GameMakerMod.CustomCharacters)
+            {
+                gml = gml.Replace($"#char_{chr.id}#", WYSCustomCharacterAPI.GameMakerMod.CustomCharacters.IndexOf(chr).ToString());
+            }
+            return gml;
+        }
         
         public static string AttachInject(string gml, CustomCharacter chara, string key, bool addconditional, string injectosearch, string enumreplace = "", bool failsafe = false, bool auto_add = true)
         {
             if (chara.overrideOnly && (key == "Jump" || key == "Physics" || key == "Collisions"))
             {
                 Logger.Log("Ignoring key: " + key + " because overrideOnly is enabled", Logger.LogLevel.Debug);
-                return gml;
+                return ReplaceCharacterEnums(gml);
             }
             if (chara.Scripts.ContainsKey(key))
             {
@@ -30,16 +38,16 @@ namespace WYSCustomCharacterAPI
             {
                 if (chara.parentCharacter != chara.id)
                 {
-                    return AttachInject(gml, WYSCustomCharacterAPI.GameMakerMod.CustomCharacters.First(x => x.id == chara.parentCharacter), key, addconditional, injectosearch, enumreplace, true); //go down the chain
+                    return ReplaceCharacterEnums(AttachInject(gml, WYSCustomCharacterAPI.GameMakerMod.CustomCharacters.First(x => x.id == chara.parentCharacter), key, addconditional, injectosearch, enumreplace, true)); //go down the chain
                 }
                 Logger.Log("Failsafe does not have:" + key, Logger.LogLevel.Warn);
-                return gml;
+                return ReplaceCharacterEnums(gml);
             }
             else
             {
-                return AttachInject(gml, WYSCustomCharacterAPI.GameMakerMod.CustomCharacters.First(x => x.id == chara.parentCharacter), key, addconditional, injectosearch, enumreplace, true); //default to shelly
+                return ReplaceCharacterEnums(AttachInject(gml, WYSCustomCharacterAPI.GameMakerMod.CustomCharacters.First(x => x.id == chara.parentCharacter), key, addconditional, injectosearch, enumreplace, true)); //default to the default character
             }
-            return gml;
+            return ReplaceCharacterEnums(gml);
         }
         
         public static string AttachInjectNoCharacter(string gml, string code, bool addconditional, string injectosearch, string enumreplace = "")

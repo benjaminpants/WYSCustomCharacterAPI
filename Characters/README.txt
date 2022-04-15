@@ -1,0 +1,3 @@
+Hi! Characters in this API are mostly handled by the folders. In the case of all built in characters, they are only handled by these folders.
+However, more complicated characters will need a dedicated mod. This is NOT a mod creator, this is a mod tool.
+Also, if you want to check if your a certain character in the case all your characters share the same code, you can do that via #char_(CHARACTERID)#
