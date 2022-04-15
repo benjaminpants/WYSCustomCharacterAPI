@@ -170,6 +170,7 @@ namespace WYSCustomCharacterAPI
             string cur_trail_part_color = "//INJECT";
             string cur_death_part_color = "//INJECT";
             string cur_flare_recolor = "//INJECT";
+            string cur_hat_script = "//INJECT";
             string cur_spotlight = GMLkvp["gml_Object_obj_spotlight_drawer_Draw_0"];
             Dictionary<string,string> stupid_workaround = new Dictionary<string, string>();
             CreateScriptFromKVP(data, "scr_set_character", "gml_Script_scr_set_character", 1);
@@ -210,6 +211,7 @@ namespace WYSCustomCharacterAPI
                 //INJECT CUSTOM MULTS", true, "//INJECT MULTIPLIERS", i.ToString());
                 cur_move_gml = Injects.AttachInject(cur_move_gml, curchar, "Multipliers", false, "//INJECT CUSTOM MULTS", i.ToString(), false, false);
                 cur_move_gml = Injects.AttachInject(cur_move_gml, curchar, "Override", true, "//INJECT COMPLETE OVERRIDE", i.ToString());
+                cur_hat_script = Injects.AttachInject(cur_hat_script, curchar, "HatPosition", true, "//INJECT", i.ToString());
                 cur_move_gml = Injects.AttachInject(cur_move_gml, curchar, "Jump", true, "//INJECT JUMP", i.ToString());
                 cur_move_gml = Injects.AttachInject(cur_move_gml, curchar, "Physics", true, "//INJECT PHYSICS", i.ToString());
                 cur_move_gml = Injects.AttachInject(cur_move_gml, curchar, "Collisions", true, "//INJECT COLLISIONS", i.ToString());
@@ -256,10 +258,11 @@ namespace WYSCustomCharacterAPI
 
             data.Code.ByName("gml_Object_obj_player_Step_0").AppendGmlSafe(cur_trail_part_color, data);
 
+            data.Code.ByName("gml_Object_obj_simple_hat_Other_10").ReplaceGmlSafe(cur_hat_script, data);
+
             data.Code.ByName("gml_Object_obj_player_Step_0").AppendGmlSafe(cur_flare_recolor, data);
             
             data.Code.ByName("gml_Object_obj_player_Step_0").AppendGmlSafe(cur_death_part_color, data);
-
 
             data.Code.ByName("gml_GlobalScript_scr_move_like_a_snail_ini").ReplaceGmlSafe(cur_gml, data);
 
